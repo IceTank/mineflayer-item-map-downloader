@@ -1,9 +1,7 @@
 const mc = require('mineflayer')
-const colors = require('./colors.json')
 const express = require('express')
 const app = express()
-const sharp = require('sharp')
-const { hexToByte } = require('./lib/util.js')
+const { mapToImage, supportedVersions } = require('./lib/util.js')
 const { promises: fs } = require('fs')
 
 const bot = mc.createBot({
@@ -11,10 +9,6 @@ const bot = mc.createBot({
   username: 'archivebot'
 })
 
-const readline = require('readline')
-
-/** @type {Record<number, Buffer>} */
-const mapsData = {}
 /** @type {Record<number, Buffer>} */
 const maps = {}
 
@@ -30,48 +24,32 @@ app.get('/maps', (req, res) => {
   }))
 })
 
-const serverInstance = app.listen(8080, () => {
+app.listen(8080, () => {
   console.info('Listening on port 8080 http://localhost:8080')
 })
 
 bot._client.on('packet', (data, meta) => {
   if (meta.name === 'map') {
-    if (!(data.itemDamage in mapsData)) {
-      mapsData[data.itemDamage] = new Buffer.from(data.data)
-      writeMap(data.data, data.itemDamage)
+    const mapId = data.itemDamage
+    if (!(mapId in maps)) {
+      mapToImage(data.data, data.itemDamage, bot.majorVersion)
+        .then((pngBuf) => {
+          maps[mapId] = pngBuf
+          fs.mkdir('./images', { recursive: true }).then(() => {
+            fs.writeFile(`./images/map_${mapId.toString().padStart(6, '0')}.png`, pngBuf)
+          })
+        })
+        .catch(console.error)
     }
   }
 })
 
-async function writeMap(data, mapId) {
-  const buf = new Buffer.from(data)
-  if (isNaN(Number(mapId))) throw new Error('Invalid map id')
-
-  const imgBuf = new Uint8ClampedArray(128 * 128 * 4)
-  for (let index = 0; index < imgBuf.byteLength; index += 4) {
-    const colorArr = hexToByte(colors[buf[index / 4]])
-    for (let k = 0; k < 4; k++) {
-      imgBuf[index + k] = colorArr[k]
-    }
-  }
-
-  await fs.mkdir('./images', { recursive: true })
-  const png = await sharp(imgBuf, {
-    raw: {
-      width: 128,
-      height: 128,
-      channels: 4
-    }
-  })
-    .png()
-    .toBuffer()
-  
-  maps[mapId] = png
-  fs.writeFile(`./images/map_${mapId.toString().padStart(6, '0')}.png`, png)
-}
-
 bot.once('spawn', () => {
-  console.info('Spawned')
+  console.info('Spawned Version ' + bot.majorVersion)
+  if (!supportedVersions.includes(bot.majorVersion)) {
+    console.error('Version not supported use one of the following versions: ' + supportedVersions.join(','))
+    bot.end()
+  }
 })
 
 bot.on('kicked', reason => console.info('Kicked for', reason))
