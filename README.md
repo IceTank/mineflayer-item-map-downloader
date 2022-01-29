@@ -1,5 +1,8 @@
 # Mineflayer map downloaded
 Automatically downloads item maps when in render distance of an item frame with a map in it or if a map is in the bots inventory.
+<img src="https://user-images.githubusercontent.com/61137113/151663467-1d665cac-2a45-4948-b218-3e146a7cbf95.png" height="300px" alt="In game image of the map">
+<img src="https://user-images.githubusercontent.com/61137113/151663482-8ecb28c7-52f4-4e4b-87fd-717da4624b1e.png" height="300px" alt="Downloaded image of the map" style="image-rendering: pixelated;">
+
 ## Notice: some colors for pre 1.12 are wrong
 
 ## Installing
