@@ -1,57 +1,52 @@
-const mc = require('mineflayer')
-const express = require('express')
-const app = express()
 const { mapToImage, supportedVersions } = require('./lib/util.js')
 const { promises: fs } = require('fs')
+const path = require('path')
 
-const bot = mc.createBot({
-  host: 'localhost',
-  username: 'archivebot'
-})
+/**
+ * @typedef MapPacket
+ * @property {number} itemDamage
+ * @property {number} scale
+ * @property {boolean} trackingPosition
+ * @property {Array<unknown>} icons
+ * @property {number} columns
+ * @property {number?} rows
+ * @property {number?} x
+ * @property {number?} y
+ * @property {Buffer?} data
+ */
 
-/** @type {Record<number, Buffer>} */
-const maps = {}
+/**
+ * @param {import('mineflayer').Bot} bot 
+ */
+function inject(bot, options = {}) {
+  if (!supportedVersions.includes(bot.majorVersion)) {
+    console.error('Map downloader: Version not supported')
+    return
+  }
 
-app.use(express.static('./public'))
+  bot.mapDownloader = {}
+  bot.mapDownloader.maps = {}
 
-app.get('/maps', (req, res) => {
-  const entires = Object.entries(maps)
-  res.json(entires.map(e => {
-    return {
-      id: e[0],
-      data: e[1].toString('base64')
-    }
-  }))
-})
+  bot.mapDownloader.outputDir = options["mapDownloader-outputDir"] ?? path.join('.')
+  bot.mapDownloader.saveToFile = options["mapDownloader-saveToFile"] ?? true
 
-app.listen(8080, () => {
-  console.info('Listening on port 8080 http://localhost:8080')
-})
-
-bot._client.on('packet', (data, meta) => {
-  if (meta.name === 'map') {
+  bot._client.on('map', /** @param {MapPacket} data */ (data) => {
     const mapId = data.itemDamage
-    if (!(mapId in maps)) {
+    if (!(mapId in bot.mapDownloader.maps) && data.data && data.columns === -128 && data.rows === -128) {
       mapToImage(data.data, data.itemDamage, bot.majorVersion)
         .then((pngBuf) => {
-          maps[mapId] = pngBuf
-          fs.mkdir('./images', { recursive: true }).then(() => {
-            fs.writeFile(`./images/map_${mapId.toString().padStart(6, '0')}.png`, pngBuf)
+          bot.mapDownloader.maps[mapId] = pngBuf
+          if (!bot.mapDownloader.saveToFile) return
+          fs.mkdir(bot.mapDownloader.outputDir, { recursive: true }).then(() => {
+            fs.writeFile(path.join(bot.mapDownloader.outputDir, `map_${mapId.toString().padStart(6, '0')}.png`), pngBuf)
           })
         })
         .catch(console.error)
     }
-  }
-})
+  })
+}
 
-bot.once('spawn', () => {
-  console.info('Spawned Version ' + bot.majorVersion)
-  if (!supportedVersions.includes(bot.majorVersion)) {
-    console.error('Version not supported use one of the following versions: ' + supportedVersions.join(','))
-    bot.end()
-  }
-})
-
-bot.on('kicked', reason => console.info('Kicked for', reason))
-bot.on('error', console.error)
-bot.on('end', () => console.info('Disconnected'))
+module.exports = {
+  mapDownloader: inject,
+  supportedVersions
+}

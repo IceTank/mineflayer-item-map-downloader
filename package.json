@@ -1,5 +1,5 @@
 {
-  "name": "map-art-wall-bot",
+  "name": "mineflayer-item-map-downloader",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
     "mineflayer": "^3.11.2",
     "sharp": "^0.29.3"
+  },
+  "devDependencies": {
+    "mineflayer-item-map-downloader": "file:./"
   }
 }
