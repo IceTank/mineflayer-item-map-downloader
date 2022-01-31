@@ -24,6 +24,9 @@ function inject(bot, options = {}) {
     return
   }
 
+  // Mojang fixed columns and rows having negative numbers for 1.17
+  const fullColumnRow = require('minecraft-data')(bot.version).version['>']('1.16.5') ? 128 : -128
+
   bot.mapDownloader = {}
   bot.mapDownloader.maps = {}
 
@@ -32,7 +35,7 @@ function inject(bot, options = {}) {
 
   bot._client.on('map', /** @param {MapPacket} data */ (data) => {
     const mapId = data.itemDamage
-    if (!(mapId in bot.mapDownloader.maps) && data.data && data.columns === -128 && data.rows === -128) {
+    if (!(mapId in bot.mapDownloader.maps) && data.data && data.columns === fullColumnRow && data.rows === fullColumnRow) {
       mapToImage(data.data, data.itemDamage, bot.majorVersion)
         .then((pngBuf) => {
           bot.mapDownloader.maps[mapId] = pngBuf
