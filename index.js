@@ -16,17 +16,17 @@ const path = require('path')
  */
 
 /**
- * @param {import('mineflayer').Bot} bot 
+ * @param {import('mineflayer').Bot} bot
  */
-function mineflayerPlugin(bot, options = {}) {
+function mineflayerPlugin (bot, options = {}) {
   if (!supportedVersions.includes(bot.majorVersion)) {
     console.error('Map downloader: Version not supported')
     return
   }
 
-  const outputDir = options["mapDownloader-outputDir"] ?? path.join('.')
-  const saveToFile = options["mapDownloader-saveToFile"] ?? true
-  const saveInternal = options["mapDownloader-saveInternal"] ?? true
+  const outputDir = options['mapDownloader-outputDir'] ?? path.join('.')
+  const saveToFile = options['mapDownloader-saveToFile'] ?? true
+  const saveInternal = options['mapDownloader-saveInternal'] ?? true
 
   bot.mapDownloader = new MapSaver(bot.version, { outputDir, saveToFile, saveInternal })
 
@@ -36,7 +36,7 @@ function mineflayerPlugin(bot, options = {}) {
 }
 
 class MapSaver {
-  constructor(version, options = {}) {
+  constructor (version, options = {}) {
     this.outputDir = options.outputDir ?? path.join('.')
     this.saveToFile = options.saveToFile ?? true
     this.saveInternal = options.saveInternal ?? true
@@ -48,7 +48,7 @@ class MapSaver {
   }
 
   /** @param {MapPacket} data */
-  onMapPacket(data) {
+  onMapPacket (data) {
     const mapId = data.itemDamage
     if (!(mapId in this.maps) && data.data && data.columns === this.fullColumnRow && data.rows === this.fullColumnRow) {
       mapToImage(data.data, data.itemDamage, this.majorVersion)

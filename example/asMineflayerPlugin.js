@@ -5,8 +5,8 @@ const path = require('path')
 const bot = mc.createBot({
   host: 'localhost',
   username: 'archivebot',
-  "mapDownloader-saveToFile": true, // default
-  "mapDownloader-outputDir": path.join(__dirname, './maps')
+  'mapDownloader-saveToFile': true, // default
+  'mapDownloader-outputDir': path.join(__dirname, './maps')
 })
 
 bot.loadPlugin(mapDownloader) // important to load it before spawning to get all maps

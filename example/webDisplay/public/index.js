@@ -1,6 +1,5 @@
-function loadAllMaps() {
+function loadAllMaps () {
   fetch('/maps').then(async data => {
-    debugger
     data = await data.json()
     console.info(data[0])
     const anchor = document.getElementById('maps-main')

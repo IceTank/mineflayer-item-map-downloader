@@ -4,7 +4,7 @@ const path = require('path')
 
 const client = mp.createClient({
   host: 'localhost',
-  username: 'archivebot',
+  username: 'archivebot'
 })
 
 client.once('login', () => {
