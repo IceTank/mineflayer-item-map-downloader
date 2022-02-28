@@ -18,38 +18,54 @@ const path = require('path')
 /**
  * @param {import('mineflayer').Bot} bot 
  */
-function inject(bot, options = {}) {
+function mineflayerPlugin(bot, options = {}) {
   if (!supportedVersions.includes(bot.majorVersion)) {
     console.error('Map downloader: Version not supported')
     return
   }
 
-  // Mojang fixed columns and rows having negative numbers for 1.17
-  const fullColumnRow = require('minecraft-data')(bot.version).version['>']('1.16.5') ? 128 : -128
+  const outputDir = options["mapDownloader-outputDir"] ?? path.join('.')
+  const saveToFile = options["mapDownloader-saveToFile"] ?? true
+  const saveInternal = options["mapDownloader-saveInternal"] ?? true
 
-  bot.mapDownloader = {}
-  bot.mapDownloader.maps = {}
+  bot.mapDownloader = new MapSaver(bot.version, { outputDir, saveToFile, saveInternal })
 
-  bot.mapDownloader.outputDir = options["mapDownloader-outputDir"] ?? path.join('.')
-  bot.mapDownloader.saveToFile = options["mapDownloader-saveToFile"] ?? true
+  bot._client.on('map', (data) => {
+    bot.mapDownloader.onMapPacket(data)
+  })
+}
 
-  bot._client.on('map', /** @param {MapPacket} data */ (data) => {
+class MapSaver {
+  constructor(version, options = {}) {
+    this.outputDir = options.outputDir ?? path.join('.')
+    this.saveToFile = options.saveToFile ?? true
+    this.saveInternal = options.saveInternal ?? true
+    this.version = version
+    this.maps = {}
+    // Mojang fixed columns and rows having negative numbers for 1.17
+    this.fullColumnRow = require('minecraft-data')(this.version).version['>']('1.16.5') ? 128 : -128
+    this.majorVersion = require('minecraft-data')(this.version).version.majorVersion
+  }
+
+  /** @param {MapPacket} data */
+  onMapPacket(data) {
     const mapId = data.itemDamage
-    if (!(mapId in bot.mapDownloader.maps) && data.data && data.columns === fullColumnRow && data.rows === fullColumnRow) {
-      mapToImage(data.data, data.itemDamage, bot.majorVersion)
+    if (!(mapId in this.maps) && data.data && data.columns === this.fullColumnRow && data.rows === this.fullColumnRow) {
+      mapToImage(data.data, data.itemDamage, this.majorVersion)
         .then((pngBuf) => {
-          bot.mapDownloader.maps[mapId] = pngBuf
-          if (!bot.mapDownloader.saveToFile) return
-          fs.mkdir(bot.mapDownloader.outputDir, { recursive: true }).then(() => {
-            fs.writeFile(path.join(bot.mapDownloader.outputDir, `map_${mapId.toString().padStart(6, '0')}.png`), pngBuf)
+          if (this.saveInternal) this.maps[mapId] = pngBuf
+          if (!this.saveToFile) return
+          fs.mkdir(this.outputDir, { recursive: true }).then(() => {
+            fs.writeFile(path.join(this.outputDir, `map_${mapId.toString().padStart(6, '0')}.png`), pngBuf)
           })
         })
         .catch(console.error)
     }
-  })
+  }
 }
 
 module.exports = {
-  mapDownloader: inject,
+  mapDownloader: mineflayerPlugin,
+  MapSaver,
   supportedVersions
 }
