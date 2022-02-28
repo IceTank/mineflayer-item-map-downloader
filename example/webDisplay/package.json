@@ -1,5 +1,17 @@
 {
+  "name": "webdisplay",
+  "version": "1.0.0",
+  "main": "web.js",
   "dependencies": {
-    "express": "^4.17.1"
-  }
+    "express": "^4.17.1",
+    "mineflayer": "^4.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node web.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

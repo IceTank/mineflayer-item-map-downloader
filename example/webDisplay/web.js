@@ -2,8 +2,11 @@ const express = require('express')
 const app = express()
 const { mapDownloader } = require('mineflayer-item-map-downloader')
 const mc = require('mineflayer')
+const path = require('path')
 
-const bot = mc.createBot({})
+const bot = mc.createBot({
+  "mapDownloader-outputDir": path.join('./maps/.')
+})
 bot.loadPlugin(mapDownloader)
 
 app.use(express.static('./public'))
