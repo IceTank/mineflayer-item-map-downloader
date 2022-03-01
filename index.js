@@ -60,7 +60,9 @@ class MapSaver {
           })
         })
         .catch(console.error)
+      return true
     }
+    return false
   }
 }
 

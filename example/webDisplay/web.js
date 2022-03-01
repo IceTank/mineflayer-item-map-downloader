@@ -5,7 +5,7 @@ const mc = require('mineflayer')
 const path = require('path')
 
 const bot = mc.createBot({
-  "mapDownloader-outputDir": path.join('./maps/.')
+  'mapDownloader-outputDir': path.join('./maps/.')
 })
 bot.loadPlugin(mapDownloader)
 

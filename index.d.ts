@@ -23,7 +23,7 @@ declare module 'mineflayer-item-map-downloader' {
     saveToFile: boolean
     saveInternal: boolean
 
-    onMapPacket: (data: any) => void
+    onMapPacket: (data: any) => boolean
   }
 }
 
