@@ -6,11 +6,11 @@ const states = mc.states
 
 if (process.argv.length < 5) {
   console.log('Too few arguments!')
-  console.info('Usage: node proxy.js host port username/email [password]')
+  console.info('Usage: node proxy.js host port username/email [isCracked: true]')
   process.exit(1)
 }
 
-const version = '1.12.2'
+const version = '1.18.1'
 const chatWhenSaving = true
 
 const server = mc.createServer({
@@ -47,9 +47,11 @@ server.on('login', function (client) {
     host: process.argv[2],
     port: process.argv[3],
     username: process.argv[4],
-    password: process.argv[5] ?? undefined,
-    auth: process.argv[5] ? 'microsoft' : 'mojang',
+    password: undefined,
+    skipValidation: process.argv[5] === 'true',
+    auth: 'microsoft',
     keepAlive: false,
+    profilesFolder: path.join(__dirname, 'auth-cache'),
     version: version
   })
   client.on('packet', function (data, meta) {
