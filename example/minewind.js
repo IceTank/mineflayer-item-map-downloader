@@ -74,9 +74,10 @@ server.on('login', function (client) {
     }
   })
   targetClient.on('map', async (data) => {
-    await serverListener.getData()
+    const serverName = await serverListener.getData()
     const newMap = saver.onMapPacket(data)
     if (!newMap || !chatWhenSaving) return
+    console.info(`Saving ${data.itemDamage} under ${serverName}`)
     const msg = new ChatMessage.MessageBuilder().setText(`[MapSaver] Saving id ${data.itemDamage}`).toString()
     client.write('chat', { 
       message: msg, 
