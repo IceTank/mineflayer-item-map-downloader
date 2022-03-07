@@ -39,3 +39,21 @@ const bot = mineflayer.createBot({
 
 ### "mapDownloader-saveToFile"
   - If maps should be saved to file. If false maps are ownly stored internally. Usefull if you only want to look at maps with the web viewer. Default is `true`
+
+### "mapDownloader-saveInternal"
+  - If maps should be saved under maps. When downloading many maps this could prevent the process from using to much memory.
+
+### "mapDownloader-filePrefix"
+  - Saved maps file prefix
+
+### "mapDownloader-fileSuffix"
+  - Saved maps file suffix
+
+## Events
+
+### (`new_map`, { name, png, id })
+  - Emitted by the mapSaver and the bot when a new map was detected.
+  - Parses an object when emitted:
+    - `name` - String. The name that would be given to this map.
+    - `png` - Buffer. The png Buffer of the created map.
+    - `id` - Number. The map id off the map.

@@ -1,6 +1,7 @@
 const { mapToImage, supportedVersions } = require('./lib/util.js')
 const { promises: fs } = require('fs')
 const path = require('path')
+const EventEmitter = require('events')
 
 /**
  * @typedef MapPacket
@@ -27,19 +28,28 @@ function mineflayerPlugin (bot, options = {}) {
   const outputDir = options['mapDownloader-outputDir'] ?? path.join('.')
   const saveToFile = options['mapDownloader-saveToFile'] ?? true
   const saveInternal = options['mapDownloader-saveInternal'] ?? true
+  const filePrefix = options["mapDownloader-filePrefix"] ?? ''
+  const fileSuffix = options["mapDownloader-fileSuffix"] ?? ''
 
-  bot.mapDownloader = new MapSaver(bot.version, { outputDir, saveToFile, saveInternal })
+  bot.mapDownloader = new MapSaver(bot.version, { outputDir, saveToFile, saveInternal, filePrefix, fileSuffix })
 
   bot._client.on('map', (data) => {
     bot.mapDownloader.onMapPacket(data)
   })
+
+  bot.mapDownloader.on('new_map', data => {
+    bot.emit('new_map', data)
+  })
 }
 
-class MapSaver {
+class MapSaver extends EventEmitter {
   constructor (version, options = {}) {
+    super()
     this.outputDir = options.outputDir ?? path.join('.')
     this.saveToFile = options.saveToFile ?? true
     this.saveInternal = options.saveInternal ?? true
+    this.filePrefix = options.filePrefix ?? ''
+    this.fileSuffix = options.fileSuffix ?? ''
     this.version = version
     this.maps = {}
     // Mojang fixed columns and rows having negative numbers for 1.17
@@ -53,10 +63,16 @@ class MapSaver {
     if (!(mapId in this.maps) && data.data && data.columns === this.fullColumnRow && data.rows === this.fullColumnRow) {
       mapToImage(data.data, data.itemDamage, this.majorVersion)
         .then((pngBuf) => {
+          const mapName = `${this.filePrefix}map_${mapId.toString().padStart(6, '0')}${this.fileSuffix}.png`
+          this.emit('new_map', {
+            name: mapName,
+            png: pngBuf,
+            id: mapId,
+          })
           if (this.saveInternal) this.maps[mapId] = pngBuf
           if (!this.saveToFile) return
           fs.mkdir(this.outputDir, { recursive: true }).then(() => {
-            fs.writeFile(path.join(this.outputDir, `map_${mapId.toString().padStart(6, '0')}.png`), pngBuf)
+            fs.writeFile(path.join(this.outputDir, mapName), pngBuf)
           })
         })
         .catch(console.error)
