@@ -1,16 +1,16 @@
 {
   "name": "mineflayer-item-map-downloader",
   "version": "1.0.0",
-  "description": "",
+  "description": "Download minecraft map information and save if as png's",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Ic3Tank",
   "license": "ISC",
   "dependencies": {
-    "mineflayer": "^3.11.2",
+    "mineflayer": "^4.3.0",
     "sharp": "^0.29.3"
   },
   "devDependencies": {
