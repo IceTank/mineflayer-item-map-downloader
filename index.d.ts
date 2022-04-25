@@ -19,6 +19,10 @@ declare module 'mineflayer-item-map-downloader' {
     on(event: 'new_map', listener: newMapEventListener): this
 
     maps: MapData
+    /** Entity id item frame position map */
+    itemFrames: Map<number, string>
+    /** Item frame position and direction to map ids map */
+    mapsPosition: Map<string, number>
     saveToFile: boolean
     outputDir: string
   }
@@ -34,6 +38,10 @@ declare module 'mineflayer-item-map-downloader' {
     fileSuffix: string
 
     onMapPacket: (data: any) => boolean
+    /** Save item frame information to stich maps together */
+    onItemFrameSpawn: (data: any) => void
+    /** Trigger when a new map was added to know map positions */
+    _onMapsUpdate: () => void
   }
 }
 
