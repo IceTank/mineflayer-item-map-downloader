@@ -8,13 +8,11 @@ Automatically downloads item maps when in render distance of an item frame with 
 ## Notice: some colors for pre 1.12 might be slightly wrong
 
 ## Installing
-1. Make sure you have git installed
-
-2. Install the plugin with npm
+1. Install the plugin with npm
 ```bash
-npm i --save git+https://github.com/IceTank/mineflayer-item-map-downloader.git
+npm i --save mineflayer-proxy-inspector
 ```
-3. Load the plugin with the mineflayer plugin API
+2. Load the plugin with the mineflayer plugin API
 ```javascript
 const { mapDownloader } = require('mineflayer-item-map-downloader')
 
