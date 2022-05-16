@@ -40,6 +40,10 @@ function mineflayerPlugin (bot, options = {}) {
   bot.mapDownloader.on('new_map', data => {
     bot.emit('new_map', data)
   })
+
+  bot.mapDownloader.on('new_map_saved', data => {
+    bot.emit('new_map_saved', data)
+  })
 }
 
 class MapSaver extends EventEmitter {
@@ -72,7 +76,12 @@ class MapSaver extends EventEmitter {
           if (this.saveInternal) this.maps[mapId] = pngBuf
           if (!this.saveToFile) return
           fs.mkdir(this.outputDir, { recursive: true }).then(() => {
-            fs.writeFile(path.join(this.outputDir, mapName), pngBuf)
+            fs.writeFile(path.join(this.outputDir, mapName), pngBuf).then(() => {
+              this.emit('new_map_saved', {
+                name: mapName,
+                id: mapId,
+              })
+            });
           })
         })
         .catch(console.error)
