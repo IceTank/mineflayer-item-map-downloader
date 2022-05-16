@@ -10,7 +10,7 @@ Automatically downloads item maps when in render distance of an item frame with 
 ## Installing
 1. Install the plugin with npm
 ```bash
-npm i --save mineflayer-proxy-inspector
+npm i --save mineflayer-item-map-downloader
 ```
 2. Load the plugin with the mineflayer plugin API
 ```javascript
