@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "mineflayer": "^4.3.0",
-    "sharp": "^0.29.3"
+    "sharp": "^0.30.6"
   },
   "devDependencies": {
     "mineflayer-item-map-downloader": "file:./"
