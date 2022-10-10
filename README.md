@@ -22,6 +22,14 @@ bot.loadPlugin(mapDownloader) // load it before spawning to get all maps
 ## Examples
 Look at the `examples` folder for out of the box examples.
 
+## API
+
+### `bot.mapDownloader.activate()`
+Activates map downloading. The downloader is active by default. Note: This function is only available after `inject_allowed` has fired.
+
+### `bot.mapDownloader.deactivate()`
+Deactivate map downloading. Note: This function is only available after `inject_allowed` has fired.
+
 ## Options
 This plugin extends the `BotOptions` type from mineflayer. Add them to the createBot options when creating the bot. You can also change them later by changing the `bot.mapDownloader` properties.
 

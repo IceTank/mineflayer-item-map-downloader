@@ -49,6 +49,7 @@ function mineflayerPlugin (bot, options = {}) {
 class MapSaver extends EventEmitter {
   constructor (version, options = {}) {
     super()
+    this.isActive = true
     this.outputDir = options.outputDir ?? path.join('.')
     this.saveToFile = options.saveToFile ?? true
     this.saveInternal = options.saveInternal ?? true
@@ -63,6 +64,7 @@ class MapSaver extends EventEmitter {
 
   /** @param {MapPacket} data */
   onMapPacket (data) {
+    if (!this.isActive) return
     const mapId = data.itemDamage
     if (!(mapId in this.maps) && data.data && data.columns === this.fullColumnRow && data.rows === this.fullColumnRow) {
       mapToImage(data.data, data.itemDamage, this.majorVersion)
@@ -88,6 +90,14 @@ class MapSaver extends EventEmitter {
       return true
     }
     return false
+  }
+
+  activate() {
+    this.isActive = true
+  }
+
+  deactivate() {
+    this.isActive = false
   }
 }
 

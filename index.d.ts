@@ -18,6 +18,9 @@ declare module 'mineflayer-item-map-downloader' {
   export interface MapDownloader extends EventEmitter {
     on(event: 'new_map', listener: newMapEventListener): this
 
+    activate(): void
+    deactivate(): void
+
     maps: MapData
     saveToFile: boolean
     outputDir: string
