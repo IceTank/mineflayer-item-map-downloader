@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { Bot } from "mineflayer";
 
 export type MapData = Record<number, Buffer>
 
@@ -28,8 +29,7 @@ declare module 'mineflayer-item-map-downloader' {
 
   export class MapSaver {
     constructor(version: string, options?: MapSaverOptions)
-
-    version: version
+    version: string
     outputDir: string
     saveToFile: boolean
     saveInternal: boolean
@@ -42,8 +42,11 @@ declare module 'mineflayer-item-map-downloader' {
 
 declare module 'mineflayer' {
   interface Bot {
-    on(event: 'new_map', listener: newMapEventListener): this
     mapDownloader: MapDownloader
+  }
+
+  interface BotEvents {
+    'new_map': (listener: newMapEventListener) => Promise<void> | void
   }
 
   interface BotOptions {
